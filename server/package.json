@@ -1,0 +1,17 @@
+{
+  "name": "banker-display-system-server",
+  "version": "1.0.0",
+  "description": "home assignment for bigabid",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index",
+    "start": "node index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.12",
+    "redis": "^3.1.2"
+  }
+}
