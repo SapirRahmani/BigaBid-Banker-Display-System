@@ -1,9 +1,14 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
-const port = 3000
+const Promise = require('bluebird');
+
+const port = 8000
+
+app.use(cors())
 
 const redis = require("redis");
-const client = redis.createClient();
+const client = Promise.promisifyAll(redis.createClient());
 
 const REDIS_KEYS = {
     LIST_OF_BIDS: 'LIST_OF_BIDS',
@@ -31,9 +36,20 @@ app.get('/campaigns', (req, res) => {
 })
 
 app.get('/bids/:campaignName', (req, res) => {
-    client.zscan(REDIS_KEYS.LIST_OF_BIDS, 0, "Match", `campaign:${req.params.campaignName}`, (err, data) => {
+    // client.on("subscribe",  (channel, count)=> {
+    //     console.log(channel);
+    //     console.log(count);
+    // });
+    client.zrange(REDIS_KEYS.LIST_OF_BIDS, 0, 100, async (err, data) => {
         if (err) res.status(500).send(err)
-        else res.send(data)
+        else {
+            const bids = [];
+            await Promise.each(data, bidKey => client.get(bidKey, (err, bidJson) => {
+                console.log(bidJson);
+                bids.push(bidJson)
+            }));
+            res.send(bids)
+        }
     });
 
 })
